@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockSync Multi — Todas las Sucursales</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="stocksync_multi.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">SS</div>
+    <div class="logo-text">StockSync <span>/ Multi-sucursal</span></div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="header-date"></div>
+    <div class="umbral-control">
+      <label>Umbral mínimo</label>
+      <input type="number" id="umbral" value="2" min="1" max="99">
+      <span class="umbral-badge" id="umbral-badge">stock &lt; 2 → off</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <div class="hero">
+    <h2>Sincronización multi-sucursal</h2>
+    <p>Sube el Excel maestro de stock y el catálogo base de PedidosYa para analizar todas las sucursales.</p>
+    <div class="logic-note">La lógica es simple: stock ≥ umbral → ACTIVAR · stock &lt; umbral → DESACTIVAR · el estado actual en PedidosYa no importa</div>
+  </div>
+
+  <!-- Upload cards -->
+  <div class="upload-grid">
+    <div class="upload-card">
+      <div class="step">Paso 01</div>
+      <h3>Excel maestro de stock — Bsale</h3>
+      <p class="card-note">El archivo con todas las sucursales en una sola hoja</p>
+      <div class="drop-zone" id="drop-stock" onclick="document.getElementById('file-stock').click()">
+        <div class="drop-icon">📊</div>
+        <p class="default-text">Haz clic o arrastra el archivo</p>
+        <p class="hint-file">Stock-actual_Todas-las-sucursales_FECHA.xlsx</p>
+        <div class="file-name" id="fname-stock"></div>
+        <input type="file" id="file-stock" accept=".xlsx,.xls">
+      </div>
+    </div>
+    <div class="upload-card">
+      <div class="step">Paso 02</div>
+      <h3>Catálogo base — PedidosYa</h3>
+      <p class="card-note">Solo se usa para la lista de SKUs y nombres. Usa Colina o Curico.</p>
+      <div class="drop-zone" id="drop-cat" onclick="document.getElementById('file-cat').click()">
+        <div class="drop-icon">🛵</div>
+        <p class="default-text">Haz clic o arrastra el archivo</p>
+        <p class="hint-file">products_SUCURSAL.xlsx</p>
+        <div class="file-name" id="fname-cat"></div>
+        <input type="file" id="file-cat" accept=".xlsx,.xls">
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync button -->
+  <div class="sync-wrap">
+    <button class="btn-sync" id="btn-sync" disabled onclick="runSync()">Analizar todas las sucursales</button>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+
+    <!-- Commercial block -->
+    <div class="commercial-block">
+      <div class="commercial-main">
+        <div class="commercial-label">Productos a activar promedio</div>
+        <div class="commercial-value" id="val-listos">—</div>
+        <div class="commercial-sub" id="sub-listos">por sucursal</div>
+      </div>
+      <div class="catalog-bar-wrap">
+        <div class="catalog-bar-label">
+          <span>Cobertura promedio del catálogo</span>
+          <span id="pct-label">—%</span>
+        </div>
+        <div class="catalog-bar-track">
+          <div class="catalog-bar-fill" id="catalog-bar" style="width:0%"></div>
+        </div>
+        <div class="catalog-stats">
+          <div class="c-stat green">Total a activar <strong id="cs-activar">—</strong></div>
+          <div class="c-stat red">Total a desactivar <strong id="cs-desactivar">—</strong></div>
+          <div class="c-stat orange">Críticos totales <strong id="cs-critico">—</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-row" id="summary-global"></div>
+
+    <!-- Global table -->
+    <div class="global-table-wrap">
+      <div class="global-table-header">
+        <div class="section-dot" style="background:var(--accent)"></div>
+        <h3>Resumen por sucursal</h3>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sucursal</th>
+              <th>Productos</th>
+              <th>Activar</th>
+              <th>Desactivar</th>
+              <th>Listos para vender</th>
+              <th>Críticos (1 ud.)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-global"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sucursal tabs -->
+    <div class="suc-tabs-wrap">
+      <div class="suc-tabs-label">Detalle por sucursal — copia los SKUs directamente</div>
+      <div class="suc-tabs" id="suc-tabs"></div>
+    </div>
+
+    <!-- Sucursal panels -->
+    <div id="suc-panels"></div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <span class="footer-text">StockSync — Bsale ↔ PedidosYa</span>
+  <a href="https://github.com/bryansuarezdev" target="_blank" class="footer-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    By Bryan Suarez
+  </a>
+</footer>
+
+<script src="stocksync_multi.js"></script>
+</body>
+</html>
