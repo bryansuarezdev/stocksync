@@ -1,0 +1,17 @@
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Archivos de datos (Seguridad: no subir Excels con datos de la empresa)
+*.xlsx
+*.xls
+*.csv
+
+# Logs y temporales
+*.log
+node_modules/
+.npm/
