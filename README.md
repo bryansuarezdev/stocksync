@@ -88,23 +88,6 @@ La app está pensada para correr online sin ningún build ni servidor:
 
 ---
 
-## 🏢 Sucursales soportadas
-
-| Sucursal (Bsale) | Nombre en PedidosYa |
-|---|---|
-| COLINA | Colina |
-| CURICO | Curicó |
-| ESMERALDA | Esmeralda |
-| BALMACEDA | La Serena (Balmaceda) |
-| EL MILAGRO | La Serena II (El Milagro) |
-| RANCAGUA | Rancagua |
-| SAN FELIPE | San Felipe |
-| SAN LORENZO | San Lorenzo |
-| QUILLOTA | Quillota — *próximamente* |
-| MACHALI | Machalí — *próximamente* |
-
----
-
 ## 🗺️ Roadmap — Próximas mejoras
 
 ### 🔄 Integración con APIs de Bsale y PedidosYa

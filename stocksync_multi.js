@@ -94,18 +94,18 @@ function runSync(){
   if(!stockData || !catData) return;
   const umbral = parseInt(document.getElementById('umbral').value) || 2;
 
-  // Orden y nombres según PedidosYa — próximamente: QUILLOTA, MACHALI
+  // Orden y nombres según PedidosYa — Actualizado según imagen
   const ORDEN_PYA = [
     { bsale: 'COLINA',      display: 'Colina' },
     { bsale: 'CURICO',      display: 'Curicó' },
     { bsale: 'ESMERALDA',   display: 'Esmeralda' },
     { bsale: 'BALMACEDA',   display: 'La Serena (Balmaceda)' },
     { bsale: 'EL MILAGRO',  display: 'La Serena II (El Milagro)' },
+    { bsale: 'MACHALI',     display: 'Machalí' },
+    { bsale: 'QUILLOTA',    display: 'Quillota' },
     { bsale: 'RANCAGUA',    display: 'Rancagua' },
     { bsale: 'SAN FELIPE',  display: 'San Felipe' },
     { bsale: 'SAN LORENZO', display: 'San Lorenzo' },
-    { bsale: 'QUILLOTA',    display: 'Quillota — próximamente' },
-    { bsale: 'MACHALI',     display: 'Machalí — próximamente' },
   ];
 
   // Solo incluir las que existen en el archivo de stock
